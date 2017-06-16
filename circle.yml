@@ -1,0 +1,14 @@
+dependencies:
+  pre:
+    - curl -v -L -o cf-cli_amd64.deb 'https://cli.run.pivotal.io/stable?release=debian64&source=github'
+    - sudo dpkg -i cf-cli_amd64.deb
+    - cf -v
+test:
+  post:
+    - cf api  https://api.run.pivotal.io
+    - cf auth $CF_USER_EMAIL $CF_PASSWORD
+    - cf target -o proxy.gap.com -s development
+    - cf push size_facet_validator
+    - cf create-service newrelic standard size_facet_validator_service
+    - cf bind-service size_facet size_facet_validator_service
+    - cf restage size_facet

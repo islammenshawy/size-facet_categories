@@ -37,8 +37,8 @@ app.get('/sizefacets', function (req, res, next) {
 
 
 /* Start listening! */
-var server = app.listen(8081, function () {
-  console.log('Local server running on localhost:' + 8081);
+var server = app.listen(8080, function () {
+  console.log('Local server running on localhost:' + 8080);
 });
 
 

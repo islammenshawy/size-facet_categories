@@ -1,0 +1,5 @@
+---
+applications:
+- name: size-facet-validator
+  memory: 512M
+  command: node index.js
