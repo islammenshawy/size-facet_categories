@@ -2,8 +2,8 @@
 var Excel = require('exceljs');
 var request = require('sync-request');
 
-var sfcfilename = __dirname + "/size_facet_categories";
-var szModelfilename = __dirname + "/size_model_facets_mappings"
+var sfcfilename = __dirname + "/size_facet_categories.xlsx";
+var szModelfilename = __dirname + "/size_model_facets_mappings.xlsx"
 
 var i = 1
 
