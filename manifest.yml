@@ -1,6 +1,6 @@
 ---
 applications:
-- name: size-facet-validator
+- name: sfc_validator
   memory: 512M
   command: node index.js
   buildpack: https://github.com/cloudfoundry/nodejs-buildpack
