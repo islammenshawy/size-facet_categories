@@ -9,6 +9,4 @@ test:
     - cf auth $CF_USER_EMAIL $CF_PASSWORD
     - cf target -o proxy.gap.com -s development
     - cf push size-facet-validator
-    - cf create-service newrelic standard size_facet_validator_service
-    - cf bind-service size-facet-validator size_facet_validator_service
     - cf restage size-facet-validator
