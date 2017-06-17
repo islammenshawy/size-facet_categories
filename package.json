@@ -9,9 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "csv-parser": "^1.11.0",
-    "csv-query": "0.0.4",
     "exceljs": "^0.4.12",
-    "fs": "0.0.1-security"
+    "express": "^4.15.3",
+    "fs": "0.0.1-security",
+    "sync-request": "^4.1.0"
   }
 }

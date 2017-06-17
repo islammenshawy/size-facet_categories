@@ -1,6 +1,5 @@
 "use strict";
 var Excel = require('exceljs');
-var http = require('http');
 var request = require('sync-request');
 
 var sfcfilename = __dirname + "/size_facet_categories.xlsx";
