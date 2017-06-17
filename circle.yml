@@ -8,5 +8,5 @@ test:
     - cf api  https://api.run.pivotal.io
     - cf auth $CF_USER_EMAIL $CF_PASSWORD
     - cf target -o proxy.gap.com -s development
-    - cf push size-facet-validator
+    - cf push
     - cf restage size-facet-validator
