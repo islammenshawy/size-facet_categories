@@ -229,11 +229,13 @@ function buildSizeFacetBreadCrumb(row){
       var sizeFacetWebName = row.getCell('H');
       var sizeFacetDimName = row.getCell('I');
       var variant = row.getCell('M');
+      var dimension = row.getCell('E');
       var sizeFacetVar1Selected = row.getCell('K');
       var sizeFacetVar2Selected = row.getCell('L');
       var pipe = '|';
       var key = pipe + sizeFacetWebName + pipe + sizeFacetDimName + pipe
-        + variant + pipe + sizeFacetVar1Selected + pipe + sizeFacetVar2Selected + pipe;
+        + variant + pipe + sizeFacetVar1Selected + pipe + sizeFacetVar2Selected
+        + pipe + 'Dim_' +dimension + pipe;
       return key;
     };
 
