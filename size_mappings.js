@@ -50,7 +50,7 @@ function flattenVariantResponse(bodyjson){
 ** Function to query product skus from the product style service
 **/
 function getProductSkus(productIdVar){
-  var res = request('GET', 'http://oldnavy.gap.com/resources/productStyle/v1/' + productIdVar + '?redirect=true&?isActive=true');
+  var res = request('GET', 'http://oldnavy.gap.com/resources/productStyle/v1/' + productIdVar + '?redirect=true&isActive=true');
   var availableSizeCodes = {};
   var bodyjson = JSON.parse(res.getBody());
   var variants = flattenVariantResponse(bodyjson);
