@@ -178,6 +178,7 @@ function loadSzModelSzCodeFctsCache(workbook2, loadCacheCallback){
       worksheet.eachRow(function(row, rowNumber) {
           var rowSizeModel = row.getCell('B').value;
           var rowsizeCode = row.getCell('C').value;
+          var rowsizeFacetName = row.getCell('G').value;
           var dimension = row.getCell('E').value;
           var sfcId = row.getCell('A').value;
 
@@ -190,6 +191,7 @@ function loadSzModelSzCodeFctsCache(workbook2, loadCacheCallback){
           var currentRow = {};
           currentRow['sfcId'] = sfcId;
           currentRow['sizeCode'] = rowsizeCode;
+          currentRow['sizeFacetName'] = rowsizeFacetName;
           currentRow['dimension'] = dimension;
           currentRow['sizeFacetBreadCrumb'] = currentBrdCrumb;
 
