@@ -59,8 +59,10 @@ function getProductSkus(productIdVar){
   for(var variant of variants) {
     for(var stylecolor of variant['productStyleColors']){
       for(var sku of stylecolor['productStyleColorSkus']){
-        var sizeCode = sku['businessCatalogItemId'].substring(9,13);
-        availableSizeCodes[sizeCode] = sizeCode;
+        if(sku['inventoryStatusId'] == '0'){
+          var sizeCode = sku['businessCatalogItemId'].substring(9,13);
+          availableSizeCodes[sizeCode] = sizeCode;
+        }
       }
     }
   }
