@@ -5,6 +5,47 @@ var sfcfilename = __dirname + "/size_facet_categories.xlsx";
 var szModelfilename = __dirname + "/size_model_facets_mappings.xlsx"
 var i = 1
 
+//Function to check if element is json array
+function isJsonArray(element) {
+  return Object.prototype.toString.call(element).trim() == '[object Array]';
+}
+
+// function to handle the Json arrays sometimes coming back as objects in service,
+// not very clean implementation for the service contract that had to be handled by some logic or custom serializer
+function flattenVariantResponse(bodyjson){
+  var variants = [];
+
+  if (!isJsonArray(bodyjson['productStyleV1']['productStyleVariantList'])){
+    console.log('variants is not an array')
+    variants.push(bodyjson['productStyleV1']['productStyleVariantList']);
+  }
+  else{
+    variants = bodyjson['productStyleV1']['productStyleVariantList'];
+  }
+
+  for(var variant of variants){
+    var stylecolors = [];
+    if(!isJsonArray(variant['productStyleColors'])){
+      //console.log(JSON.stringify(variants[0]));
+      stylecolors.push(variant['productStyleColors']);
+      variant['productStyleColors'] = stylecolors;
+    }
+    else{
+      stylecolors = variant['productStyleColors'];
+    }
+
+    //Handle stylecolor SKUs
+    for(var stylecolor of stylecolors){
+      var skusSizeCodes = [];
+      if(!isJsonArray(stylecolor['productStyleColorSkus'])){
+        skusSizeCodes.push(stylecolor['productStyleColorSkus']);
+        variant['productStyleColors']['productStyleColorSkus'] = skusSizeCodes;
+      }
+    }
+  }
+  return variants;
+}
+
 /**
 ** Function to query product skus from the product style service
 **/
@@ -12,26 +53,7 @@ function getProductSkus(productIdVar){
   var res = request('GET', 'http://oldnavy.gap.com/resources/productStyle/v1/' + productIdVar + '?redirect=true&?isActive=true');
   var availableSizeCodes = {};
   var bodyjson = JSON.parse(res.getBody());
-  var variants = [];
-  var stylecolors = [];
-  var skusSizeCodes = [];
-
-  //Had to handle the variants to be object in single variant case
-  // since if single variant stylecolor response is object
-  if (typeof bodyjson['productStyleV1']['productStyleVariantList'] == 'object'){
-    variants.push(bodyjson['productStyleV1']['productStyleVariantList']);
-  }
-
-  if(typeof variants[0]['productStyleColors'] == 'object'){
-    stylecolors.push(variants[0]['productStyleColors']);
-    variants[0]['productStyleColors'] = stylecolors;
-  }
-
-  if(typeof stylecolors[0]['productStyleColorSkus'] == 'object'){
-    skusSizeCodes.push(stylecolors[0]['productStyleColorSkus']);
-    variants[0]['productStyleColors']['productStyleColorSkus'] = skusSizeCodes;
-  }
-  // ***********************************************************
+  var variants = flattenVariantResponse(bodyjson);
 
   // Loop on response to get the size code from SKUs
   for(var variant of variants) {

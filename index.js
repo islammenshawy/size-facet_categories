@@ -45,7 +45,6 @@ app.get('/sizefacets/breadcrumbs', function (req, res, next) {
   var sizeMappings = mappings.getProductSfcs(pid, szmodel, tagsSfcCache, sfcsSizeModelCache);
   for(var mappingObject of sizeMappings){
     var mappingBreadCrumb = mappingObject['sizeFacetBreadCrumb'];
-    console.log(mappingBreadCrumb);
     if(!alreadyAddedBreadCrumbs[mappingBreadCrumb]){
       szFctsMappingsBradcrumbs.push(mappingBreadCrumb);
       alreadyAddedBreadCrumbs[mappingBreadCrumb]=true;
