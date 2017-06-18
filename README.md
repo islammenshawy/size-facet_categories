@@ -1,4 +1,4 @@
-# size-facet_categories
+# Size Facet Categories Service
 This service is purposed to outline the process of compiling the size facets mappings for products based on the size facet query from the oracle tools DB into excel sheets that will be utilized as a cache.
 
 The service will use product style (First 6 digits of any product from the brand website) and size model (Available in the product feed) to compile the valid size facet categories for a specific style by mapping this information on the SKU level. Each in stock SKU will have 2 dimensions and each dimension maps to a SFC that will be represented by a breadcrumb.
@@ -19,6 +19,6 @@ FILTER ONLY SFC BREADCRUMBS: http://localhost:8080/sizefacets/breadcrumbs?pid=${
 ```
 ### Examples from the cloud instance
 ```
-http://sfc-validator.cfapps.io/sizefacets?pid=604325&szmodel=M38
-http://sfc-validator.cfapps.io/sizefacets/breadcrumbs?pid=604325&szmodel=M38
+(http://sfc-validator.cfapps.io/sizefacets?pid=604325&szmodel=M38)
+(http://sfc-validator.cfapps.io/sizefacets/breadcrumbs?pid=604325&szmodel=M38)
 ```
