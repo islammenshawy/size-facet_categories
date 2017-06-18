@@ -58,10 +58,12 @@ function getProductSkus(productIdVar){
   // Loop on response to get the size code from SKUs
   for(var variant of variants) {
     for(var stylecolor of variant['productStyleColors']){
-      for(var sku of stylecolor['productStyleColorSkus']){
-        if(sku['inventoryStatusId'] == '0'){
-          var sizeCode = sku['businessCatalogItemId'].substring(9,13);
-          availableSizeCodes[sizeCode] = sizeCode;
+      if(stylecolor['isInStock'] == 'true'){
+        for(var sku of stylecolor['productStyleColorSkus']){
+          if(sku['inventoryStatusId'] == '0'){
+            var sizeCode = sku['businessCatalogItemId'].substring(9,13);
+            availableSizeCodes[sizeCode] = sizeCode;
+          }
         }
       }
     }

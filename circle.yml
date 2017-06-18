@@ -4,6 +4,8 @@ dependencies:
     - sudo dpkg -i cf-cli_amd64.deb
     - cf -v
 test:
+  override:
+    - echo "test"
   post:
     - cf api  https://api.run.pivotal.io
     - cf auth $CF_USER_EMAIL $CF_PASSWORD
