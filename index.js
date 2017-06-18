@@ -4,8 +4,8 @@ var Excel = require('exceljs');
 require('console-stamp')(console, '[HH:MM:ss.l]');
 
 
-var workbook2 = new Excel.Workbook();
-var workbook = new Excel.Workbook();
+var szmodelWorkbook = new Excel.Workbook();
+var sfcWorkbook = new Excel.Workbook();
 var express = require('express')
 var app = express()
 var tagsSfcCache = undefined;
@@ -24,7 +24,7 @@ var setSfcSzModelCache = function(cache){
   console.warn(sfcsSizeModelCache);
 };
 
-mappings.loadSfcsCache(workbook, workbook2, setSfcCache, setSfcSzModelCache);
+mappings.loadSfcsCache(sfcWorkbook, szmodelWorkbook, setSfcCache, setSfcSzModelCache);
 
 app.get('/sizefacets', function (req, res, next) {
   var pid = req.query.pid;

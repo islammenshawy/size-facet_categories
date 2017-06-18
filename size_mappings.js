@@ -5,46 +5,47 @@ var sfcfilename = __dirname + "/size_facet_categories.xlsx";
 var szModelfilename = __dirname + "/size_model_facets_mappings.xlsx"
 var i = 1
 
-//Function to check if element is json array
+/**
+* Function to check if element is json array
+**/
 function isJsonArray(element) {
   return Object.prototype.toString.call(element).trim() == '[object Array]';
 }
 
-// function to handle the Json arrays sometimes coming back as objects in service,
-// not very clean implementation for the service contract that had to be handled by some logic or custom serializer
-function flattenVariantResponse(bodyjson){
-  var variants = [];
+/**
+* Function to convert json object to json array if it's otherwise it will just return it.
+**/
+function jsonObjectToArray(element){
+  var jsonArray = [];
+  if(!isJsonArray(element)){
+    jsonArray.push(element);
+  }else {
+    jsonArray = element;
+  }
+  return jsonArray;
+}
 
-  if (!isJsonArray(bodyjson['productStyleV1']['productStyleVariantList'])){
-    console.log('variants is not an array')
-    variants.push(bodyjson['productStyleV1']['productStyleVariantList']);
-  }
-  else{
-    variants = bodyjson['productStyleV1']['productStyleVariantList'];
-  }
+/**
+* Function to handle the Json arrays sometimes coming back as objects in service,
+* not very clean implementation for the service contract that had to be handled by some
+* logic or custom serializer
+**/
+function flattenVariantResponse(bodyjson){
+  //Handle variants to arry if it's a json object
+  var variants = jsonObjectToArray(bodyjson['productStyleV1']['productStyleVariantList']);
 
   for(var variant of variants){
-    var stylecolors = [];
-    if(!isJsonArray(variant['productStyleColors'])){
-      //console.log(JSON.stringify(variants[0]));
-      stylecolors.push(variant['productStyleColors']);
-      variant['productStyleColors'] = stylecolors;
-    }
-    else{
-      stylecolors = variant['productStyleColors'];
-    }
+    //Handle variants stylecolors to array
+    variant['productStyleColors'] = jsonObjectToArray(variant['productStyleColors']);
 
-    //Handle stylecolor SKUs
-    for(var stylecolor of stylecolors){
-      var skusSizeCodes = [];
-      if(!isJsonArray(stylecolor['productStyleColorSkus'])){
-        skusSizeCodes.push(stylecolor['productStyleColorSkus']);
-        variant['productStyleColors']['productStyleColorSkus'] = skusSizeCodes;
-      }
+    for(var stylecolor of variant['productStyleColors']){
+      //Handle stylecolor SKUs to array
+      stylecolor['productStyleColorSkus'] = jsonObjectToArray(stylecolor['productStyleColorSkus']);
     }
   }
   return variants;
 }
+
 
 /**
 ** Function to query product skus from the product style service
@@ -55,7 +56,7 @@ function getProductSkus(productIdVar){
   var bodyjson = JSON.parse(res.getBody());
   var variants = flattenVariantResponse(bodyjson);
 
-  // Loop on response to get the size code from SKUs
+  // Loop on product response to get the size code from SKUs
   for(var variant of variants) {
     for(var stylecolor of variant['productStyleColors']){
       if(stylecolor['isInStock'] == 'true'){
@@ -97,21 +98,35 @@ var getProductSfcs = function(productId, sizeModel, tagsCache, sizeModelCache){
 
   var results = [];
   var handledSizeModels = {};
-  var departmentTag = tagsJson['ProductTags']['DepartmentTags']['value'];
-  var productTypeTag = tagsJson['ProductTags']['ProductTypeTags']['value'];
-  var categoryGroupTag = tagsJson['ProductTags']['CategoryTags']['value'];
-  var tagsKey = buildSFCsCacheTagKey(departmentTag, productTypeTag, categoryGroupTag);
-  var validSfcs = tagsCache[tagsKey];
+  var validSfcs = [];
+
+  //Make Tags Json object into array
+  var departmentTags = jsonObjectToArray(tagsJson['ProductTags']['DepartmentTags']);
+  var productTypeTags = jsonObjectToArray(tagsJson['ProductTags']['ProductTypeTags']);
+  var categoryGroupTags = jsonObjectToArray(tagsJson['ProductTags']['CategoryTags']);
+
+  //Filter available SFCs from the first cache for product tags
+  for(var departmentTag of departmentTags){
+    for(var productTypeTag of productTypeTags){
+      for(var categoryGroupTag of categoryGroupTags){
+        var tagsKey = buildSFCsCacheTagKey(departmentTag['value'], productTypeTag['value'], categoryGroupTag['value']);
+        var tagValidSfcs = tagsCache[tagsKey];
+        validSfcs = validSfcs.concat(tagValidSfcs);
+      }
+    }
+  }
+
+  //Set a hashset for easy flagging and retrieval of value to make it easy instead of looping
   var validSfcsMap = {};
   for(var sfc of validSfcs){
     validSfcsMap[sfc] = sfc;
   }
+
   console.log('Start: Query Skus ');
   var skus = getProductSkus(productId);
   console.log('End: Query Skus ');
-  var sizeModels = sizeModelCache[sizeModel];
 
-  console.log('Start: Size Model loop Skus ');
+  var sizeModels = sizeModelCache[sizeModel];
   for(var sizeModel of sizeModels){
     var currentSizeCode = sizeModel['sizeCode'];
     var currentSfcId = sizeModel['sfcId'];
@@ -123,14 +138,13 @@ var getProductSfcs = function(productId, sizeModel, tagsCache, sizeModelCache){
       handledSizeModels[currentSizeCode + '_' + currentDimension] = true;
     }
   }
-  console.log('End: Size Model loop Skus ');
 
   return results;
 }
 
 
 /**
-** Function to load the size facet categories cache from the excel sheet.
+** Function to load the size facet product tags cache from size_facet_categories.xlsx excel sheet.
 **/
 var loadSfcsCache = function(workbook, workbook2, sfcacheCallback, szmodelCacheCallback){
     var tagsCache = {};
@@ -171,9 +185,9 @@ function buildSizeModelKey(sizeModel){
 }
 
 /**
-** Function to load the size code facets cache
+** Function to load the size model/size code/SFCs cache from size_model_facets_mappings.xlsx excel sheet
 **/
-function loadSzModelSzCodeFctsCache(workbook2, loadCacheCallback){
+function loadSzModelSzCodeFctsCache(workbook2, loadServerCacheCallback){
   workbook2.xlsx.readFile(szModelfilename)
     .then(function() {
       var worksheet = workbook2.getWorksheet(i);
@@ -217,9 +231,8 @@ function loadSzModelSzCodeFctsCache(workbook2, loadCacheCallback){
               sizeModelCache[cacheKey] = sizeKeyArray;
           }
       });
-      loadCacheCallback(sizeModelCache);
+      loadServerCacheCallback(sizeModelCache);
     });
-
   };
 
 /**
