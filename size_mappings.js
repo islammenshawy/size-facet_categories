@@ -189,7 +189,7 @@ function loadSzModelSzCodeFctsCache(workbook2, loadCacheCallback){
           // **** Size facet id/Model cache logic ***
           var cacheKey = buildSizeModelKey(rowSizeModel);
           var cacheValue = sizeModelCache[cacheKey];
-          var currentBrdCrumb = buildSizeFacetBreadCrumb(row, rowsizeCode + '_' + dimension);
+          var currentBrdCrumb = buildSizeFacetBreadCrumb(row);
 
           //current Row from implementation.
           var currentRow = {};
@@ -225,7 +225,7 @@ function loadSzModelSzCodeFctsCache(workbook2, loadCacheCallback){
 /**
 ** Function to build the size facet breadCrumb
 **/
-function buildSizeFacetBreadCrumb(row, sizeCodeWithDimension){
+function buildSizeFacetBreadCrumb(row){
       var sizeFacetWebName = row.getCell('H');
       var sizeFacetDimName = row.getCell('I');
       var variant = row.getCell('M');
