@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "console-stamp": "^0.2.5",
     "exceljs": "^0.4.12",
     "express": "^4.15.3",
     "fs": "0.0.1-security",

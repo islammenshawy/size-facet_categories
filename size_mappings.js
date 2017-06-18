@@ -1,17 +1,40 @@
 "use strict";
 var Excel = require('exceljs');
 var request = require('sync-request');
-
 var sfcfilename = __dirname + "/size_facet_categories.xlsx";
 var szModelfilename = __dirname + "/size_model_facets_mappings.xlsx"
-
 var i = 1
 
+/**
+** Function to query product skus from the product style service
+**/
 function getProductSkus(productIdVar){
   var res = request('GET', 'http://oldnavy.gap.com/resources/productStyle/v1/' + productIdVar + '?redirect=true&?isActive=true');
   var availableSizeCodes = {};
   var bodyjson = JSON.parse(res.getBody());
-  for(var variant of bodyjson['productStyleV1']['productStyleVariantList']) {
+  var variants = [];
+  var stylecolors = [];
+  var skusSizeCodes = [];
+
+  //Had to handle the variants to be object in single variant case
+  // since if single variant stylecolor response is object
+  if (typeof bodyjson['productStyleV1']['productStyleVariantList'] == 'object'){
+    variants.push(bodyjson['productStyleV1']['productStyleVariantList']);
+  }
+
+  if(typeof variants[0]['productStyleColors'] == 'object'){
+    stylecolors.push(variants[0]['productStyleColors']);
+    variants[0]['productStyleColors'] = stylecolors;
+  }
+
+  if(typeof stylecolors[0]['productStyleColorSkus'] == 'object'){
+    skusSizeCodes.push(stylecolors[0]['productStyleColorSkus']);
+    variants[0]['productStyleColors']['productStyleColorSkus'] = skusSizeCodes;
+  }
+  // ***********************************************************
+
+  // Loop on response to get the size code from SKUs
+  for(var variant of variants) {
     for(var stylecolor of variant['productStyleColors']){
       for(var sku of stylecolor['productStyleColorSkus']){
         var sizeCode = sku['businessCatalogItemId'].substring(9,13);
@@ -22,19 +45,30 @@ function getProductSkus(productIdVar){
   return availableSizeCodes;
 }
 
+/**
+** Function to hit product tags API and get the response for a product
+**/
 var getProductTags = function(productIdVar){
   var res = request('GET', 'http://oldnavy.gap.com/resources/productTags/v1/' + productIdVar);
   return JSON.parse(res.getBody());
 }
 
-//Function to build the c
+/**
+** Function to build the cache key for sfcs
+**/
 function buildSFCsCacheTagKey(departmentTag, productTypeTag, categoryGroupTag){
   var pipe = '|';
   return departmentTag + pipe + productTypeTag + pipe + categoryGroupTag;
 }
 
+/**
+** Function to build the products sfcs from the cache
+**/
 var getProductSfcs = function(productId, sizeModel, tagsCache, sizeModelCache){
+  console.log('Start: Query style tags');
   var tagsJson = getProductTags(productId);
+  console.log('End: Query style tags');
+
   var results = [];
   var handledSizeModels = {};
   var departmentTag = tagsJson['ProductTags']['DepartmentTags']['value'];
@@ -46,9 +80,12 @@ var getProductSfcs = function(productId, sizeModel, tagsCache, sizeModelCache){
   for(var sfc of validSfcs){
     validSfcsMap[sfc] = sfc;
   }
+  console.log('Start: Query Skus ');
   var skus = getProductSkus(productId);
+  console.log('End: Query Skus ');
   var sizeModels = sizeModelCache[sizeModel];
 
+  console.log('Start: Size Model loop Skus ');
   for(var sizeModel of sizeModels){
     var currentSizeCode = sizeModel['sizeCode'];
     var currentSfcId = sizeModel['sfcId'];
@@ -60,12 +97,16 @@ var getProductSfcs = function(productId, sizeModel, tagsCache, sizeModelCache){
       handledSizeModels[currentSizeCode + '_' + currentDimension] = true;
     }
   }
+  console.log('End: Size Model loop Skus ');
+
   return results;
 }
 
 
-//Read valid categories from the json
-var readValidSfcs = function(workbook, workbook2, sfcacheCallback, szmodelCacheCallback){
+/**
+** Function to load the size facet categories cache from the excel sheet.
+**/
+var loadSfcsCache = function(workbook, workbook2, sfcacheCallback, szmodelCacheCallback){
     var tagsCache = {};
     workbook.xlsx.readFile(sfcfilename)
     .then(function() {
@@ -95,7 +136,7 @@ var readValidSfcs = function(workbook, workbook2, sfcacheCallback, szmodelCacheC
         }
       });
       sfcacheCallback(tagsCache);
-      readSzModelSzCodeFcts(workbook2, szmodelCacheCallback);
+      loadSzModelSzCodeFctsCache(workbook2, szmodelCacheCallback);
     });
 };
 
@@ -103,7 +144,10 @@ function buildSizeModelKey(sizeModel){
   return sizeModel;
 }
 
-function readSzModelSzCodeFcts(workbook2, loadCacheCallback){
+/**
+** Function to load the size code facets cache
+**/
+function loadSzModelSzCodeFctsCache(workbook2, loadCacheCallback){
   workbook2.xlsx.readFile(szModelfilename)
     .then(function() {
       var worksheet = workbook2.getWorksheet(i);
@@ -150,7 +194,9 @@ function readSzModelSzCodeFcts(workbook2, loadCacheCallback){
 
   };
 
-//Function to build the size facet breadCrumb
+/**
+** Function to build the size facet breadCrumb
+**/
 function buildSizeFacetBreadCrumb(row, sizeCodeWithDimension){
       var sizeFacetWebName = row.getCell('H');
       var sizeFacetDimName = row.getCell('I');
@@ -163,4 +209,4 @@ function buildSizeFacetBreadCrumb(row, sizeCodeWithDimension){
       return key;
     };
 
-module.exports = {readValidSfcs, readSzModelSzCodeFcts, getProductSfcs};
+module.exports = {loadSfcsCache, loadSzModelSzCodeFctsCache, getProductSfcs};
