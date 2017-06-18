@@ -24,13 +24,15 @@ var setSfcSzModelCache = function(cache){
   console.warn(sfcsSizeModelCache);
 };
 
+//Load both excel sheets into cache
 mappings.loadSfcsCache(sfcWorkbook, szmodelWorkbook, setSfcCache, setSfcSzModelCache);
 
 app.get('/sizefacets', function (req, res, next) {
   var pid = req.query.pid;
+  var styleId = pid.length > 6 ? pid.substring(0,9) : pid;
   var szmodel = req.query.szmodel;
-  console.log('Product: ' + pid + ', size model: ' + szmodel);
-  var response = mappings.getProductSfcs(pid, szmodel, tagsSfcCache, sfcsSizeModelCache);
+  console.log('Product style: ' + styleId + ', size model: ' + szmodel);
+  var response = mappings.getProductSfcs(styleId, szmodel, tagsSfcCache, sfcsSizeModelCache);
   res.set('Content-Type', 'application/json');
   res.send(response);
   next();
@@ -38,11 +40,12 @@ app.get('/sizefacets', function (req, res, next) {
 
 app.get('/sizefacets/breadcrumbs', function (req, res, next) {
   var pid = req.query.pid;
+  var styleId = pid.length > 6 ? pid.substring(0,9) : pid;
   var szmodel = req.query.szmodel;
-  console.log('Product: ' + pid + ', size model: ' + szmodel);
+  console.log('Product style: ' + styleId + ', size model: ' + szmodel);
   var szFctsMappingsBradcrumbs = [];
   var alreadyAddedBreadCrumbs = {};
-  var sizeMappings = mappings.getProductSfcs(pid, szmodel, tagsSfcCache, sfcsSizeModelCache);
+  var sizeMappings = mappings.getProductSfcs(styleId, szmodel, tagsSfcCache, sfcsSizeModelCache);
   for(var mappingObject of sizeMappings){
     var mappingBreadCrumb = mappingObject['sizeFacetBreadCrumb'];
     if(!alreadyAddedBreadCrumbs[mappingBreadCrumb]){
