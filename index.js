@@ -29,7 +29,7 @@ mappings.loadSfcsCache(sfcWorkbook, szmodelWorkbook, setSfcCache, setSfcSzModelC
 
 app.get('/sizefacets', function (req, res, next) {
   var pid = req.query.pid;
-  var styleId = pid.length > 6 ? pid.substring(0,9) : pid;
+  var styleId = pid.length > 6 ? pid.substring(0,6) : pid;
   var szmodel = req.query.szmodel;
   console.log('Product style: ' + styleId + ', size model: ' + szmodel);
   var response = mappings.getProductSfcs(styleId, szmodel, tagsSfcCache, sfcsSizeModelCache);
@@ -40,7 +40,7 @@ app.get('/sizefacets', function (req, res, next) {
 
 app.get('/sizefacets/breadcrumbs', function (req, res, next) {
   var pid = req.query.pid;
-  var styleId = pid.length > 6 ? pid.substring(0,9) : pid;
+  var styleId = pid.length > 6 ? pid.substring(0,6) : pid;
   var szmodel = req.query.szmodel;
   console.log('Product style: ' + styleId + ', size model: ' + szmodel);
   var szFctsMappingsBradcrumbs = [];
