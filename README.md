@@ -13,12 +13,11 @@ run using command: node index.js
 ```
 ### Hitting service end points
 In Local you can use the below urls to compile the size codes for a style.
-```
+
 ALL SIZE FACETS FOR A STYLE: http://localhost:8080/sizefacets?pid=${productStyle}&szmodel=${sizeModel}
 FILTER ONLY SFC BREADCRUMBS: http://localhost:8080/sizefacets/breadcrumbs?pid=${productStyle}&szmodel=${sizeModel}
-```
+
 ### Examples from the cloud instance
-```
-(http://sfc-validator.cfapps.io/sizefacets?pid=604325&szmodel=M38)
-(http://sfc-validator.cfapps.io/sizefacets/breadcrumbs?pid=604325&szmodel=M38)
-```
+http://sfc-validator.cfapps.io/sizefacets?pid=604325&szmodel=M38
+http://sfc-validator.cfapps.io/sizefacets/breadcrumbs?pid=604325&szmodel=M38
+
