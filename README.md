@@ -20,4 +20,3 @@ In Local you can use the below urls to compile the size codes for a style.
 ### Examples from the cloud instance
 * http://sfc-validator.cfapps.io/sizefacets?pid=604325&szmodel=M38
 * http://sfc-validator.cfapps.io/sizefacets/breadcrumbs?pid=604325&szmodel=M38
-
