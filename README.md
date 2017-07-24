@@ -9,6 +9,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites for running in local
 ```
 install node v6.10.3
+npm install
 run using command: node index.js
 ```
 ### Hitting service end points
