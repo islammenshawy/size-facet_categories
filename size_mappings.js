@@ -246,9 +246,8 @@ function buildSizeFacetBreadCrumb(row){
       var sizeFacetVar1Selected = row.getCell('K');
       var sizeFacetVar2Selected = row.getCell('L');
       var pipe = '|';
-      var key = pipe + sizeFacetWebName + pipe + sizeFacetDimName + pipe
-        + variant + pipe + sizeFacetVar1Selected + pipe + sizeFacetVar2Selected
-        + pipe + 'Dim_' +dimension + pipe;
+      var key = sizeFacetWebName + pipe + sizeFacetDimName + pipe
+        + variant + pipe + sizeFacetVar1Selected + pipe + sizeFacetVar2Selected;
       return key;
     };
 
